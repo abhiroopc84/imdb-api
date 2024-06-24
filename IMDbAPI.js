@@ -82,4 +82,15 @@ class IMDbAPI {
       return "Title not found";
     }
   }
+
+  // Public method to get release year
+  async getReleaseYear(search) {
+    const imdb_id = await this._getIdFromSearch(search);
+    if (imdb_id) {
+      this.details = await this._getDetails(imdb_id);
+      return this.details.props.pageProps.aboveTheFoldData.releaseYear.year;
+    } else {
+      return "Title not found";
+    }
+  }
 }
