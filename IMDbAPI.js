@@ -44,4 +44,31 @@ class IMDbAPI {
       return "";
     }
   }
+
+  // Private method to get detailed information about a title
+  async _getDetails(imdb_id) {
+    try {
+      if (!this.sourceDOM) {
+        this.sourceDOM = await this._getPage(`${this.url}/title/${imdb_id}`);
+      }
+      const details1 = JSON.parse(
+        this.sourceDOM.window.document.querySelector(
+          'script[type="application/ld+json"]'
+        ).innerHTML
+      );
+      const details2 = JSON.parse(
+        this.sourceDOM.window.document.querySelector(
+          'script[type="application/json"]'
+        ).innerHTML
+      );
+      this.details = { ...details1, ...details2 };
+      if (this.details) {
+        return this.details;
+      } else {
+        throw new Error("No IMDb details found.");
+      }
+    } catch (error) {
+      return error;
+    }
+  }
 }
