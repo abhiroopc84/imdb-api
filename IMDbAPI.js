@@ -93,4 +93,73 @@ class IMDbAPI {
       return "Title not found";
     }
   }
+
+  // Private method to convert list to text
+  _listToText(array) {
+    return array.join(", ").replace(/,(?!.*,)/gim, " and");
+  }
+
+  // Private method to get people information (director, creator, etc.)
+  async _getPeople(imdb_id, people_type, InList = false, name_id = false) {
+    try {
+      if (!this.details) {
+        this.details = await this._getDetails(imdb_id);
+      }
+      const People = [];
+      this.details[people_type].forEach((person) => {
+        if (Object.keys(person).includes("name")) {
+          if (name_id) {
+            People.push({
+              [people_type]: person.name,
+              id: person.url.substring(6, person.url.length - 1),
+            });
+          } else {
+            People.push(person.name);
+          }
+        }
+      });
+      if (InList || name_id) {
+        return People;
+      } else {
+        return this._listToText(People);
+      }
+    } catch (error) {
+      if (InList) {
+        return [];
+      } else {
+        return error;
+      }
+    }
+  }
+
+  // Public method to get directors
+  async getDirector(search, InList = false, name_id = false) {
+    const imdb_id = await this._getIdFromSearch(search);
+    if (imdb_id) {
+      return this._getPeople(imdb_id, "director", InList, name_id);
+    } else {
+      return "Title not found";
+    }
+  }
+
+  // Public method to get creators
+  async getCreator(search, InList = false, name_id = false) {
+    const imdb_id = await this._getIdFromSearch(search);
+    if (imdb_id) {
+      return this._getPeople(imdb_id, "creator", InList, name_id);
+    } else {
+      return "Title not found";
+    }
+  }
+
+  // Public method to get main actors
+  async getMainActors(search, InList = true, name_id = false) {
+    const imdb_id = await this._getIdFromSearch(search);
+    if (imdb_id) {
+      return this._getPeople(imdb_id, "actor", InList, name_id);
+    } else {
+      return "Title not found";
+    }
+  }
+
 }
