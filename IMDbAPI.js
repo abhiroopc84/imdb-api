@@ -301,4 +301,36 @@ class IMDbAPI {
     }
   }
 
+  // Public method to get release date
+  async getReleaseDate(search) {
+    const imdb_id = await this._getIdFromSearch(search);
+    if (imdb_id) {
+      this.details = await this._getDetails(imdb_id);
+      if (this.details.datePublished) {
+        return this.details.datePublished;
+      } else {
+        const release_date =
+          this.details.props.pageProps.aboveTheFoldData.releaseDate;
+        let date = release_date.year.toString();
+        if (release_date.month) {
+          let month = release_date.month.toString();
+          if (month.length === 1) {
+            month = "0" + month;
+          }
+          date += `-${month}`;
+          if (release_date.day) {
+            let day = release_date.day.toString();
+            if (day.length === 1) {
+              day = "0" + day;
+            }
+            date += `-${day}`;
+          }
+        }
+        return date;
+      }
+    } else {
+      return "Title not found";
+    }
+  }
+
 }
