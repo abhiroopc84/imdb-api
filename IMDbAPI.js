@@ -333,4 +333,14 @@ class IMDbAPI {
     }
   }
 
+  // Public method to get description
+  async getDescription(search) {
+    const imdb_id = await this._getIdFromSearch(search);
+    if (imdb_id) {
+      this.details = await this._getDetails(imdb_id);
+      return this.details.description;
+    } else {
+      return "Title not found";
+    }
+  }
 }
