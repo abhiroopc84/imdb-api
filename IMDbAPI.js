@@ -248,4 +248,26 @@ class IMDbAPI {
     }
   }
 
+  // Public method to get genres
+  async getGenres(search) {
+    const imdb_id = await this._getIdFromSearch(search);
+    if (imdb_id) {
+      this.details = await this._getDetails(imdb_id);
+      return this.details.genre;
+    } else {
+      return "Title not found";
+    }
+  }
+
+  // Public method to get type (Movie or TV Series)
+  async getType(search) {
+    const imdb_id = await this._getIdFromSearch(search);
+    if (imdb_id) {
+      this.details = await this._getDetails(imdb_id);
+      return this.details["@type"];
+    } else {
+      return "Title not found";
+    }
+  }
+
 }
