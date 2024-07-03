@@ -238,4 +238,14 @@ class IMDbAPI {
     }
   }
 
+  // Public method to get companies
+  async getCompanies(search) {
+    const imdb_id = await this._getIdFromSearch(search);
+    if (imdb_id) {
+      return this._getInfo(imdb_id, "company");
+    } else {
+      return "Title not found";
+    }
+  }
+
 }
