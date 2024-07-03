@@ -162,4 +162,60 @@ class IMDbAPI {
     }
   }
 
+  // Private method to get information (languages, countries, etc.)
+  async _getInfo(imdb_id, info_type, InList = true) {
+    let info_id;
+    switch (info_type) {
+      case "language":
+        info_id = "title-details-languages";
+        break;
+      case "country":
+        info_id = "title-details-origin";
+        break;
+      case "company":
+        info_id = "title-details-companies";
+        break;
+      case "aka":
+        info_id = "title-details-akas";
+        break;
+      case "filming_location":
+        info_id = "title-details-filminglocations";
+        break;
+      default:
+        console.log("Invalid argument in getInfo");
+        return "";
+    }
+
+    let info = [];
+    try {
+      if (!this.sourceDOM) {
+        this.sourceDOM = await this._getPage(`${this.url}/title/${imdb_id}`);
+      }
+      let elements = this.sourceDOM.window.document.querySelectorAll(
+        `li[data-testid="${info_id}"] div[class="ipc-metadata-list-item__content-container"] a`
+      );
+      for (const element of elements) {
+        info.push(element.textContent);
+      }
+      if (info.length === 0) {
+        elements = this.sourceDOM.window.document.querySelectorAll(`
+          li[data-testid="${info_id}"] div[class="ipc-metadata-list-item__content-container"] span`);
+        for (const element of elements) {
+          info.push(element.textContent);
+        }
+      }
+      if (InList) {
+        return info;
+      } else {
+        return this._listToText(info);
+      }
+    } catch (error) {
+      if (InList) {
+        return [];
+      } else {
+        return error;
+      }
+    }
+  }
+
 }
