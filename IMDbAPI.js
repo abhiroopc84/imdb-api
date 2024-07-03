@@ -270,4 +270,35 @@ class IMDbAPI {
     }
   }
 
+  // Public method to get runtime
+  async getRuntime(search, seconds = false) {
+    const imdb_id = await this._getIdFromSearch(search);
+    if (imdb_id) {
+      this.details = await this._getDetails(imdb_id);
+      if (seconds) {
+        return this.details.props.pageProps.aboveTheFoldData.runtime.seconds;
+      } else {
+        let duration = this.details.duration.substring(
+          2,
+          this.details.duration.length - 1
+        );
+        if (!duration.includes("H")) {
+          if (duration.length === 1) {
+            duration = "0" + duration;
+          }
+          duration = "0h" + duration;
+        } else {
+          if (duration.length === 3) {
+            duration = duration.replace("H", "h0");
+          } else {
+            duration = duration.replace("H", "h");
+          }
+        }
+        return duration;
+      }
+    } else {
+      return "Title not found";
+    }
+  }
+
 }
