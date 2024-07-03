@@ -365,4 +365,15 @@ class IMDbAPI {
       return "Title not found";
     }
   }
+
+  // Public method to get poster URL
+  async getPosterURL(search) {
+    const imdb_id = await this._getIdFromSearch(search);
+    if (imdb_id) {
+      this.details = await this._getDetails(imdb_id);
+      return this.details.image;
+    } else {
+      return "Title not found";
+    }
+  }
 }
