@@ -218,4 +218,14 @@ class IMDbAPI {
     }
   }
 
+  // Public method to get countries
+  async getCountries(search) {
+    const imdb_id = await this._getIdFromSearch(search);
+    if (imdb_id) {
+      return this._getInfo(imdb_id, "country");
+    } else {
+      return "Title not found";
+    }
+  }
+
 }
