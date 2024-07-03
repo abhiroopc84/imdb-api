@@ -376,4 +376,80 @@ class IMDbAPI {
       return "Title not found";
     }
   }
+
+  // Public method to get cast
+  async getCast(search, limit = 15, uncredited = false, all = false, name_id = false) {
+    const imdb_id = await this._getIdFromSearch(search);
+    if (imdb_id) {
+      try {
+        const sourceActorsDOM = await this._getPage(
+          this.url + "/title/" + imdb_id + "/fullcredits"
+        );
+        let cast_list = [];
+        let full_cast;
+        if (sourceActorsDOM) {
+          full_cast = sourceActorsDOM.window.document.querySelector(
+            'table[class="cast_list"]'
+          );
+        }
+        if (full_cast) {
+          let counter = 0;
+          for (const actor of [
+            ...full_cast.querySelectorAll("tr").values(),
+          ].slice(1)) {
+            let row_number = 0;
+            let cast = {};
+            for (const row of [...actor.querySelectorAll("td").values()]) {
+              if (row_number == 1) {
+                cast["actor"] = row
+                  .querySelector("a")
+                  .text.replace(/[\t\r\n]/, "")
+                  .trim();
+                cast["url"] = row.querySelector("a").href;
+                const sourceDOM = await this._getPage(this.url + cast["url"]);
+                const imageURL = JSON.parse(
+                  sourceDOM.window.document.querySelector(
+                    'script[type="application/ld+json"]'
+                  ).innerHTML
+                ).image;
+                cast["image_url"] = imageURL;
+              }
+              if (row_number == 3) {
+                let character = row
+                  .querySelector("a")
+                  .text.replace(/[\t\r\n]/, "")
+                  .trim();
+                character = character.replace(/ +/, " ");
+                if (character.includes("uncredited") && !uncredited) {
+                  continue;
+                }
+                cast["character"] = character;
+                cast_list.push(cast);
+                counter += 1;
+              }
+              if (name_id) {
+                if (row_number == 0 && row.a != null) {
+                  cast["id"] = row.a["href"].substring(
+                    6,
+                    row.a["href"].length - 1
+                  );
+                }
+              }
+              row_number += 1;
+            }
+            if (counter == limit && !all) {
+              break;
+            }
+          }
+        } else {
+          throw new Error("No actors found.");
+        }
+        return cast_list;
+      } catch (error) {
+        return error;
+      }
+    } else {
+      return "Title not found";
+    }
+  }
 }
