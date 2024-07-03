@@ -354,4 +354,15 @@ class IMDbAPI {
       return "Title not found";
     }
   }
+
+  // Public method to get rating
+  async getRating(search) {
+    const imdb_id = await this._getIdFromSearch(search);
+    if (imdb_id) {
+      this.details = await this._getDetails(imdb_id);
+      return this.details.aggregateRating.ratingValue;
+    } else {
+      return "Title not found";
+    }
+  }
 }
